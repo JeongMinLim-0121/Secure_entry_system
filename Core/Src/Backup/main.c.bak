@@ -1,0 +1,203 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "i2c.h"
+#include "spi.h"
+#include "gpio.h"
+#include "usart.h"
+
+#include "i2c-lcd.h"
+#include "RC522.h"
+#include <string.h>
+#include <stdio.h>
+
+/* USER CODE BEGIN Includes */
+
+extern I2C_HandleTypeDef hi2c2;
+extern UART_HandleTypeDef huart2;
+
+/* USER CODE END Includes */
+
+uint8_t savedID[4] = {0xCA, 0x4D, 0xD1, 0x05};
+
+void led_yellow_on(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+}
+
+void led_yellow_off(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+}
+
+void led_green_on(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+}
+
+void led_green_off(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+}
+
+void led_red_on(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+}
+
+void led_red_off(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+}
+void buzzer_on(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
+}
+
+void buzzer_off(void) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
+}
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+	  HAL_Init();
+	  SystemClock_Config();
+	  MX_GPIO_Init();
+	  MX_I2C2_Init();
+	  MX_SPI1_Init();
+	  MX_USART2_UART_Init();
+
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+
+	  lcd_init();
+	  lcd_clear();
+
+	  MFRC522_Init();
+
+	  led_yellow_on();
+	  led_green_off();
+	  led_red_off();
+
+	  buzzer_off();
+
+	  lcd_clear();
+	  lcd_send_string("Touch Card");
+
+	  uint8_t status;
+	  uint8_t str[MAX_LEN];
+	  uint8_t uid[5];
+
+  while (1)
+  {
+
+      if (MFRC522_Request(PICC_REQIDL, str) == MI_OK)
+      {
+          if (MFRC522_Anticoll(str) == MI_OK)
+          {
+        	 memcpy(uid, str, 5);
+
+			 lcd_clear();
+			 lcd_put_cur(1, 0);
+			 HAL_Delay(1500);
+
+			 if (memcmp(uid, savedID, 4) == 0)
+			         {
+			           lcd_clear();
+			           lcd_send_string("WELCOME");
+
+			           led_yellow_off();
+					   led_green_on();
+					   HAL_Delay(2000);
+					   led_green_off();
+			         }
+			         else
+			         {
+			           lcd_clear();
+			           lcd_send_string("ACCESS DENIED");
+
+			           led_yellow_off();
+					   led_red_on();
+					   buzzer_on();
+					   HAL_Delay(2000);
+					   led_red_off();
+					   buzzer_off();
+			         }
+
+			         HAL_Delay(2000);
+			         lcd_clear();
+			         lcd_send_string("Touch Card");
+			         led_yellow_on();
+          }
+      }
+
+  }
+}
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
+
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    Error_Handler();
+
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                              | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+    Error_Handler();
+}
+
+/**
+  * @brief  Error Handler
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  __disable_irq();
+  while (1)
+  {
+  }
+}

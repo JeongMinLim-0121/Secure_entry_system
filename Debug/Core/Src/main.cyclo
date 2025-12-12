@@ -1,0 +1,11 @@
+../Core/Src/main.c:31:6:led_yellow_on	1
+../Core/Src/main.c:35:6:led_yellow_off	1
+../Core/Src/main.c:39:6:led_green_on	1
+../Core/Src/main.c:43:6:led_green_off	1
+../Core/Src/main.c:47:6:led_red_on	1
+../Core/Src/main.c:51:6:led_red_off	1
+../Core/Src/main.c:54:6:buzzer_on	1
+../Core/Src/main.c:58:6:buzzer_off	1
+../Core/Src/main.c:82:5:main	4
+../Core/Src/main.c:161:6:SystemClock_Config	3
+../Core/Src/main.c:197:6:Error_Handler	1
