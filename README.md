@@ -81,4 +81,6 @@ MCU 중심 임베디드 시스템의 전체 동작 흐름을 체계적으로 이
 
 https://github.com/user-attachments/assets/98623aa3-7f83-4c36-a693-e7c5cf22269c
 
+##  **전자 회로도**
+<img width="1702" height="1174" alt="image" src="https://github.com/user-attachments/assets/1c657189-d32d-4e12-bad1-26f7ff2867c6" />
 
