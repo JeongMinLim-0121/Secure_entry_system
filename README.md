@@ -12,15 +12,18 @@
 ---
 ## 🎬 2. 시연 영상
 
-https://github.com/user-attachments/assets/98623aa3-7f83-4c36-a693-e7c5cf22269c
+ https://github.com/user-attachments/assets/67d784ac-4380-4812-8d79-416c29d028aa
 
 ---
 ## 🧠 3. 하드웨어 아키텍처 (전자 회로도)
-> STM32를 중심으로 입력 장치(카드/버튼),출력 장치(LED, Buzzer),전원부로 구성된 출입 인증 시스템의 하드웨어 기반 시스템 아키텍처입니다.
+> STM32를 중심으로 입력 장치(카드/버튼),
+> 출력 장치(LED, Buzzer), 전원부로 구성된
+> 출입 인증 시스템의 하드웨어 기반 시스템 아키텍처입니다.
+
 <img width="1702" height="1174" alt="image" src="https://github.com/user-attachments/assets/1c657189-d32d-4e12-bad1-26f7ff2867c6" />
 
  ---
-## 🔧 4.핵심 기능
+## 🔧 4. 핵심 기능
  
 ### ⚙️ Device (입력 · 인증 · 제어)
 - 카드 입력 신호를 GPIO로 수신하고, 인터럽트 기반 이벤트 처리를 통해 실시간 입력을 감지
